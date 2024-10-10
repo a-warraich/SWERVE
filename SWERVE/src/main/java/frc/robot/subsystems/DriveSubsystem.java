@@ -4,8 +4,8 @@
 
 package frc.robot.subsystems;
 
-//import com.ctre.phoenix6.hardware.Pigeon2;
-//import edu.wpi.first.hal.HAL;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import edu.wpi.first.hal.HAL;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -46,8 +46,8 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final AHRS Nav_x = new AHRS(I2C.Port.kMXP);
-  //private final Pigeon2 pigeon2 = new Pigeon2(21);
+  //private final AHRS Nav_x = new AHRS(I2C.Port.kMXP);
+  private final Pigeon2 pigeon2 = new Pigeon2(21);
 
   // Slew rate filter variables for controlling lateral acceleration
   private double m_currentRotation = 0.0;
@@ -61,7 +61,7 @@ public class DriveSubsystem extends SubsystemBase {
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
-      Rotation2d.fromDegrees(-Nav_x.getAngle()),
+      Rotation2d.fromDegrees(-pigeon2.getAngle()),
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
@@ -78,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_odometry.update(
-        Rotation2d.fromDegrees(-Nav_x.getAngle()),
+        Rotation2d.fromDegrees(-pigeon2.getAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -103,7 +103,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose) {
     m_odometry.resetPosition(
-        Rotation2d.fromDegrees(-Nav_x.getAngle()),
+        Rotation2d.fromDegrees(-pigeon2.getAngle()),
         new SwerveModulePosition[] {
             m_frontLeft.getPosition(),
             m_frontRight.getPosition(),
@@ -183,7 +183,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     SwerveModuleState[] swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-Nav_x.getAngle()))
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, Rotation2d.fromDegrees(-pigeon2.getAngle()))
             : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
@@ -227,7 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    Nav_x.reset();
+    pigeon2.reset();
   }
 
   /**
@@ -236,7 +236,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the robot's heading in degrees, from -180 to 180
    */
   public double getHeading() {
-    return Rotation2d.fromDegrees(-Nav_x.getAngle()).getDegrees();
+    return Rotation2d.fromDegrees(-pigeon2.getAngle()).getDegrees();
   }
 
   /**
@@ -245,6 +245,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The turn rate of the robot, in degrees per second
   //  */
   public double getTurnRate() {
-    return Nav_x.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    return pigeon2.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }
